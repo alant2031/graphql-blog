@@ -52,7 +52,6 @@ const userExists = async (userId, dataSource) => {
 };
 
 const createPostInfo = async (postData, dataSource) => {
-  console.log(postData);
   const { title, body, userId } = postData;
 
   await userExists(userId, dataSource);

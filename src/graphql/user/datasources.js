@@ -1,5 +1,10 @@
 import { RESTDataSource } from 'apollo-datasource-rest';
 import { makeUserDataLoader } from './dataloaders';
+import {
+  createUserFn,
+  updateUserFn,
+  deleteUserFn,
+} from './utils/user-repository';
 
 export class UserApi extends RESTDataSource {
   constructor() {
@@ -18,6 +23,18 @@ export class UserApi extends RESTDataSource {
     return this.get(id, undefined, {
       cacheOptions: { ttl: 30 },
     });
+  }
+
+  async createUser(data) {
+    return createUserFn(data, this);
+  }
+
+  async updateUser(userId, data) {
+    return updateUserFn(userId, data, this);
+  }
+
+  async deleteUser(userId) {
+    return deleteUserFn(userId, this);
   }
 
   batchLoadById(id) {

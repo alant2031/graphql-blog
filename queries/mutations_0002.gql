@@ -1,0 +1,38 @@
+# Query variables
+# {
+#  "title": "Well, Marty, I'm",
+#  "body": "Well just gimme something without any sugar in it, okay?",
+#  "userId": "602"
+# }
+mutation CREATE_POST($title: String!, $body: String!, $userId: String!) {
+  createPost(data: { title: $title, body: $body, userId: $userId }) {
+    id
+    title
+    body
+    user {
+      firstName
+    }
+    indexRef
+    createdAt
+  }
+}
+
+# {
+#   "postId": "dkwJghN",
+#   "data": {
+#     "title": "O novo título",
+#     "body": "O novo body"
+#   }
+# }
+mutation UPDATE_POST($postId: ID!, $data: UpdatePostInput!) {
+  updatePost(postId: $postId, data: $data) {
+    id
+    title
+    body
+    user {
+      firstName
+    }
+    indexRef
+    createdAt
+  }
+}

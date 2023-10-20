@@ -10,7 +10,7 @@ export class PostApi extends RESTDataSource {
   constructor() {
     super();
     this.baseURL = process.env.API_URL + '/posts/';
-    this.dataLoader = makePostDataLoader((p) => this.getPosts(p));
+    this.dataLoader = makePostDataLoader(this.getPosts.bind(this));
   }
 
   async getPosts(urlParams = {}) {
