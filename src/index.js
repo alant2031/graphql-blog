@@ -4,6 +4,7 @@ import { context } from './graphql/context';
 
 import { PostApi } from './graphql/post/datasources';
 import { UserApi } from './graphql/user/datasources';
+import { LoginApi } from './graphql/login/datasources';
 
 import { resolvers, typeDefs } from './graphql/schema';
 
@@ -15,6 +16,7 @@ const server = new ApolloServer({
     return {
       postApi: new PostApi(),
       userApi: new UserApi(),
+      loginApi: new LoginApi(),
     };
   },
 });

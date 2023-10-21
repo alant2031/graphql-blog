@@ -1,7 +1,8 @@
-import { ValidationError } from 'apollo-server';
+import { UserInputError, ValidationError } from 'apollo-server';
+import bcrypt from 'bcrypt';
 
 export const createUserFn = async (userData, dataSource) => {
-  checkUserField(userData, true);
+  await checkUserField(userData, true);
   const indexRefUser = await dataSource.get('', {
     _limit: 1,
     _sort: 'indexRef',
@@ -23,7 +24,7 @@ export const createUserFn = async (userData, dataSource) => {
 };
 
 export const updateUserFn = async (userId, userData, dataSource) => {
-  checkUserField(userData);
+  await checkUserField(userData);
   if (!userId) throw new ValidationError('UserId is required');
   if (userData.userName) {
     const foundUser = await userExists(userData.userName, dataSource);
@@ -41,8 +42,8 @@ export const deleteUserFn = async (userId, dataSource) => {
   return !!(await dataSource.delete(userId));
 };
 
-const checkUserField = (user, allFieldsRequired = false) => {
-  const userFields = ['firstName', 'lastName', 'userName'];
+const checkUserField = async (user, allFieldsRequired = false) => {
+  const userFields = ['firstName', 'lastName', 'userName', 'password'];
 
   for (const field of userFields) {
     if (!allFieldsRequired) {
@@ -53,9 +54,19 @@ const checkUserField = (user, allFieldsRequired = false) => {
       validateUserName(user[field]);
     }
 
+    if (field === 'password') {
+      validateUserPassword(user[field]);
+    }
+
     if (!user[field]) {
       throw new ValidationError(`${field} field is empty`);
     }
+  }
+  if (user.password && !user.passwordHash) {
+    const { password } = user;
+    const passwordHash = await bcrypt.hash(password, 6);
+    user.passwordHash = passwordHash;
+    delete user['password'];
   }
 };
 
@@ -69,5 +80,14 @@ const validateUserName = (userName) => {
 
   if (!userName.match(userNameRegExp)) {
     throw new ValidationError(`userName must match ${userNameRegExp}`);
+  }
+};
+
+const validateUserPassword = (password) => {
+  const strongPasswordRegex = /^(?=.*[a-zA-Z])(?=.*\d).{6,}$/;
+  if (!password.match(strongPasswordRegex)) {
+    throw new UserInputError(
+      'Password must be at least 6 characters long and include both letters and numbers.',
+    );
   }
 };
