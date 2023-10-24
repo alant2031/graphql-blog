@@ -9,18 +9,21 @@ export class LoginApi extends RESTDataSource {
     this.baseURL = process.env.API_URL + '/users/';
   }
 
-  async login(userName, password) {
-    const users = await this.get(
-      '',
-      { userName },
-      { cacheOptions: { ttl: 0 } },
-    );
-    const found = !!users.length;
+  async getUser(userName) {
+    const user = await this.get('', { userName }, { cacheOptions: { ttl: 0 } });
+    const found = !!user.length;
     if (!found) {
       throw new AuthenticationError('Invalid credentials (User)');
     }
 
-    const { passwordHash, id: userId } = users[0];
+    return user[0];
+  }
+
+  async login(userName, password) {
+    const user = await this.getUser(userName);
+
+    const { passwordHash, id: userId } = user;
+
     const isPasswordValid = await this.checkUserPassword(
       password,
       passwordHash,
@@ -38,6 +41,16 @@ export class LoginApi extends RESTDataSource {
     };
   }
 
+  async logout(userName) {
+    const user = await this.getUser(userName);
+
+    if (user.id !== this.context.loggedUserId) {
+      throw new AuthenticationError('You are not this user');
+    }
+
+    await this.patch(user.id, { token: '' }, { cacheOptions: { ttl: 0 } });
+    return true;
+  }
   checkUserPassword(password, passwordHash) {
     return bcrypt.compare(password, passwordHash);
   }

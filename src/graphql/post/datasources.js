@@ -1,5 +1,6 @@
 import { RESTDataSource } from 'apollo-datasource-rest';
 import { makePostDataLoader } from './dataloaders';
+
 import {
   createPostFn,
   updatePostFn,

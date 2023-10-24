@@ -13,7 +13,6 @@ const authUser = async (req) => {
     if (foundUser.token !== token) return 0;
     return userId;
   } catch (error) {
-    console.log(error);
     return 0;
   }
 };

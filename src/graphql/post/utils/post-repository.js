@@ -1,4 +1,5 @@
-import { ValidationError } from 'apollo-server';
+import { AuthenticationError, ValidationError } from 'apollo-server';
+import { FetchError } from 'node-fetch';
 
 export const createPostFn = async (postData, dataSource) => {
   const postInfo = await createPostInfo(postData, dataSource);
@@ -9,29 +10,44 @@ export const createPostFn = async (postData, dataSource) => {
   return dataSource.post('', { ...postInfo });
 };
 
+export const findPostOwner = async (postId, dataSource) => {
+  const foundPost = await dataSource.get(postId, undefined, {
+    cacheOptions: { ttl: 0 },
+  });
+  if (!foundPost) {
+    throw new FetchError('Could not find the post you are looking for.');
+  }
+  if (foundPost.userId !== dataSource.context.loggedUserId) {
+    throw new AuthenticationError('You cannot update this post 😠!');
+  }
+};
 export const updatePostFn = async (postId, postData, dataSource) => {
   if (!postId) {
     throw new ValidationError('Missing postId');
   }
 
-  const { title, body, userId } = postData;
+  const { userId } = await findPostOwner(postId, dataSource);
+  const { title, body } = postData;
 
   if (typeof title !== 'undefined') {
     if (!title) {
-      throw new ValidationError('title field is empty');
+      throw new ValidationError('title missing');
     }
   }
+
   if (typeof body !== 'undefined') {
     if (!body) {
-      throw new ValidationError('body field is empty');
+      throw new ValidationError('body missing');
     }
   }
+
   if (typeof userId !== 'undefined') {
     if (!userId) {
-      throw new ValidationError('userId field is empty');
+      throw new ValidationError('userId missing');
     }
     await userExists(userId, dataSource);
   }
+
   return dataSource.patch(postId, { ...postData });
 };
 
@@ -39,6 +55,7 @@ export const deletePostFn = async (postId, dataSource) => {
   if (!postId) {
     throw new ValidationError('Missing postId');
   }
+  await findPostOwner(postId, dataSource);
   const deleted = await dataSource.delete(postId);
   return !!deleted;
 };
