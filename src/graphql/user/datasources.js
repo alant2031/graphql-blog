@@ -15,13 +15,13 @@ export class UserApi extends RESTDataSource {
 
   async getUsers(urlParams = {}) {
     return this.get('', urlParams, {
-      cacheOptions: { ttl: 30 },
+      cacheOptions: { ttl: 0 },
     });
   }
 
   async getUser(id) {
     return this.get(id, undefined, {
-      cacheOptions: { ttl: 30 },
+      cacheOptions: { ttl: 0 },
     });
   }
 

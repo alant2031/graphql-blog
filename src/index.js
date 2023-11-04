@@ -1,4 +1,5 @@
 import { ApolloServer } from 'apollo-server';
+import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
 
 import { context } from './graphql/context';
 
@@ -18,6 +19,12 @@ const server = new ApolloServer({
       userApi: new UserApi(),
       loginApi: new LoginApi(),
     };
+  },
+  plugins: [ApolloServerPluginLandingPageGraphQLPlayground()],
+
+  cors: {
+    origin: ['*'],
+    credentials: true,
   },
 });
 

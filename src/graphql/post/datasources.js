@@ -15,11 +15,11 @@ export class PostApi extends RESTDataSource {
   }
 
   async getPosts(urlParams = {}) {
-    return this.get('', urlParams, { cacheOptions: { ttl: 30 } });
+    return this.get('', urlParams, { cacheOptions: { ttl: 0 } });
   }
 
   async getPost(id) {
-    return this.get(id, {}, { cacheOptions: { ttl: 30 } });
+    return this.get(id, {}, { cacheOptions: { ttl: 0 } });
   }
 
   async createPost(postData) {
