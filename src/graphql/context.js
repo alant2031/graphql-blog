@@ -13,7 +13,7 @@ const verifyJwtToken = async (token) => {
     return userId;
   } catch (e) {
     // console.log(e);
-    return '';
+    return 0;
   }
 };
 
