@@ -1,11 +1,11 @@
-import { ApolloServer } from 'apollo-server';
 import { ApolloServerPluginLandingPageGraphQLPlayground } from '@apollo/server-plugin-landing-page-graphql-playground';
+import { ApolloServer } from 'apollo-server';
 
 import { context } from './graphql/context';
 
+import { LoginApi } from './graphql/login/datasources';
 import { PostApi } from './graphql/post/datasources';
 import { UserApi } from './graphql/user/datasources';
-import { LoginApi } from './graphql/login/datasources';
 
 import { resolvers, typeDefs } from './graphql/schema';
 
